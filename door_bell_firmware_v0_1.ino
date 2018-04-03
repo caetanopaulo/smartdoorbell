@@ -18,6 +18,7 @@ const char* mqttUser = "mqttuser";
 const char* mqttPassword = "someotherpassword";
 
 int oldState = LOW;
+int newState = LOW;
  
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -44,13 +45,7 @@ void setup() {
  
     if (client.connect("ESP8266Client", mqttUser, mqttPassword )) {
  
-       digitalWrite(PIN_LED_OUTPUT, LOW);
-       delay(200);
-       digitalWrite(PIN_LED_OUTPUT, HIGH);
-       delay(200);
-       digitalWrite(PIN_LED_OUTPUT, LOW);
-       delay(200);
-       digitalWrite(PIN_LED_OUTPUT, HIGH);
+       ledBlink(2,200);
        delay(400);
       //Serial.println("connected");  
  
@@ -58,13 +53,7 @@ void setup() {
  
       //Serial.print("failed with state ");
       //Serial.print(client.state());
-      digitalWrite(PIN_LED_OUTPUT, LOW);
-       delay(800);
-       digitalWrite(PIN_LED_OUTPUT, HIGH);
-       delay(800);
-       digitalWrite(PIN_LED_OUTPUT, LOW);
-       delay(800);
-       digitalWrite(PIN_LED_OUTPUT, HIGH);
+      ledBlink(6,800);
       delay(2000);
  
     }
@@ -73,17 +62,25 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-   const int newState = digitalRead(PIN_DOORBELL_SWITCH);
+   newState = digitalRead(PIN_DOORBELL_SWITCH);
    if (newState != oldState) {
         if (newState == HIGH) {
-            digitalWrite(PIN_LED_OUTPUT, LOW);
-            delay(250);
-            digitalWrite(PIN_LED_OUTPUT, HIGH);
             client.publish("doorbell/activated", "Someone is at your door");
-            delay(250); 
+            ledBlink(1,250); 
         }
         oldState = newState;
-        delay(2500);
+        delay(1500);
    }
     client.loop();
+    delay(500);   
 }
+
+void ledBlink(int numberOfBlinks, int blinkingInterval){
+   while(numberOfBlinks > 0){
+       digitalWrite(PIN_LED_OUTPUT, LOW);
+       delay(blinkingInterval);
+       digitalWrite(PIN_LED_OUTPUT, HIGH);
+       delay(blinkingInterval);
+       numberOfBlinks = numberOfBlinks -1;
+   }
+  }
