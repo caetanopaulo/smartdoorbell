@@ -16,6 +16,8 @@ const char* mqttServer = "192.168.2.4";
 const int mqttPort = 1883;
 const char* mqttUser = "mqttuser";
 const char* mqttPassword = "someotherpassword";
+
+int oldState = LOW;
  
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -64,12 +66,16 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-   if(digitalRead(PIN_DOORBELL_SWITCH)) {
-        digitalWrite(PIN_LED_OUTPUT, LOW);
-        delay(300);
-        digitalWrite(PIN_LED_OUTPUT, HIGH);
-        client.publish("esp/test", "Hello from ESP8266");
-        delay(300); 
+   const int newState = digitalRead(PIN_DOORBELL_SWITCH);
+   if (newState != oldState) {
+        if (newState == HIGH) {
+            digitalWrite(PIN_LED_OUTPUT, LOW);
+            delay(300);
+            digitalWrite(PIN_LED_OUTPUT, HIGH);
+            client.publish("esp/test", "Hello from ESP8266");
+            delay(300); 
+        }
+        oldState = newState;
    }
     client.loop();
 }
