@@ -58,6 +58,13 @@ void setup() {
  
       //Serial.print("failed with state ");
       //Serial.print(client.state());
+      digitalWrite(PIN_LED_OUTPUT, LOW);
+       delay(800);
+       digitalWrite(PIN_LED_OUTPUT, HIGH);
+       delay(800);
+       digitalWrite(PIN_LED_OUTPUT, LOW);
+       delay(800);
+       digitalWrite(PIN_LED_OUTPUT, HIGH);
       delay(2000);
  
     }
@@ -70,12 +77,13 @@ void loop() {
    if (newState != oldState) {
         if (newState == HIGH) {
             digitalWrite(PIN_LED_OUTPUT, LOW);
-            delay(300);
+            delay(250);
             digitalWrite(PIN_LED_OUTPUT, HIGH);
-            client.publish("esp/test", "Hello from ESP8266");
-            delay(300); 
+            client.publish("doorbell/activated", "Someone is at your door");
+            delay(250); 
         }
         oldState = newState;
+        delay(2500);
    }
     client.loop();
 }
