@@ -1,37 +1,32 @@
 /*
- ESP8266 Blink by Simon Peter
- Blink the blue LED on the ESP-01 module
- This example code is in the public domain
+ * SmartDoorbell project
+ * Authors: Rick Slinkman, Paulo Caetano
+ *
+ */
 
- The blue LED on the ESP-01 module is connected to GPIO1 
- (which is also the TXD pin; so we cannot use Serial.print() at the same time)
-
- Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
-*/
-
+const PIN_OUTPUT = 1;           // GPIO1 aka TX
+const PIN_DOORBELL_SWITCH = 3;  // GPIO3 aka RX
 
 void setup() {
-  pinMode(1, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
-  pinMode(3, INPUT);
-  
-   digitalWrite(1, LOW);                
-   delay(200);                     
-   digitalWrite(1, HIGH); 
-   delay(200); 
-   digitalWrite(1, LOW);  
-   delay(200);                     
-   digitalWrite(1, HIGH); 
+  pinMode(PIN_OUTPUT, OUTPUT);
+  pinMode(PIN_DOORBELL_SWITCH, INPUT);
+
+   digitalWrite(PIN_OUTPUT, LOW);
+   delay(200);
+   digitalWrite(PIN_OUTPUT, HIGH);
+   delay(200);
+   digitalWrite(PIN_OUTPUT, LOW);
+   delay(200);
+   digitalWrite(PIN_OUTPUT, HIGH);
    delay(400);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  
-   if(digitalRead(3)) {
-        digitalWrite(1, LOW);                
-        delay(300);                     
-        digitalWrite(1, HIGH);  
-        delay(300);  
+   if(digitalRead(PIN_DOORBELL_SWITCH)) {
+        digitalWrite(PIN_OUTPUT, LOW);
+        delay(300);
+        digitalWrite(PIN_OUTPUT, HIGH);
+        delay(300);
    }
-                   
 }
