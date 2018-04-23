@@ -16,9 +16,6 @@ const char* mqttServer = "192.168.2.4";
 const int mqttPort = 1883;
 const char* mqttUser = "mqttuser";
 const char* mqttPassword = "someotherpassword";
-
-int oldState = LOW;
-int newState = LOW;
  
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -47,6 +44,7 @@ void setup() {
  
        ledBlink(2,200);
        delay(400);
+       attachInterrupt(PIN_DOORBELL_SWITCH, highInterrupt, HIGH);
       //Serial.println("connected");  
  
     } else {
@@ -60,19 +58,25 @@ void setup() {
   }
 }
 
+volatile boolean turnOn = false;
+// delay in milliseconds between blinks of the LED
+unsigned int interval = 5000;
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 3000;
+
 // the loop function runs over and over again forever
-void loop() {
-   newState = digitalRead(PIN_DOORBELL_SWITCH);
-   if (newState != oldState) {
-        if (newState == HIGH) {
-            client.publish("doorbell/activated", "Someone is at your door");
-            ledBlink(1,250); 
-        }
-        oldState = newState;
-        delay(1500);
-   }
-    client.loop();
-    delay(500);   
+void loop() {   
+    client.loop(); 
+    //delay(10);
+    if(turnOn){
+      turnOn = LOW;
+      if ((millis() - lastDebounceTime) > debounceDelay) {
+        lastDebounceTime = millis();
+        ledBlink(1,250);
+        client.publish("doorbell/activated", "Someone is at your door"); 
+      }
+      attachInterrupt(PIN_DOORBELL_SWITCH, highInterrupt, RISING);
+    }
 }
 
 void ledBlink(int numberOfBlinks, int blinkingInterval){
@@ -83,4 +87,10 @@ void ledBlink(int numberOfBlinks, int blinkingInterval){
        delay(blinkingInterval);
        numberOfBlinks = numberOfBlinks -1;
    }
-  }
+}
+
+void highInterrupt(){
+    detachInterrupt(PIN_DOORBELL_SWITCH);
+    turnOn = HIGH;
+}
+
